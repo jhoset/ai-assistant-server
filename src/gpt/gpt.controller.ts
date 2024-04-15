@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { GptService } from './gpt.service';
-import { OrthographyDto, ProsConsAnalyzerDto } from './dtos';
+import { OrthographyDto, ProsConsAnalyzerDto, TranslateDto } from './dtos';
 import { Response } from 'express';
 
 @Controller('gpt')
@@ -28,6 +28,25 @@ export class GptController {
     for await (const chunk of stream) {
       const piece = chunk.choices[0].delta.content || '';
       // console.log(piece);
+      response.write(piece);
+    }
+    response.end();
+  }
+
+  @Post('translate')
+  translate(@Body() translateDto: TranslateDto) {
+    return this.gptService.translate(translateDto);
+  }
+
+  @Post('translate-stream')
+  async translateStream(
+    @Body() translateDto: TranslateDto,
+    @Res() response: Response) {
+    const stream = await this.gptService.translateStream(translateDto);
+    response.setHeader('Content-Type', 'application/json');
+    response.status(HttpStatus.OK);
+    for await (const chunk of stream) {
+      const piece = chunk.choices[0].delta.content || '';
       response.write(piece);
     }
     response.end();
