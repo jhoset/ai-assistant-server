@@ -5,7 +5,7 @@ import {
   prosConsUseCase,
   translateStreamUseCase,
   translateUseCase,
-  textToAudioUseCase,
+  textToAudioUseCase, audioToTextUseCase,
 } from './use-cases';
 import { OrthographyDto, ProsConsAnalyzerDto, TextToAudioDto, TranslateDto } from './dtos';
 import OpenAI from 'openai';
@@ -52,6 +52,10 @@ export class GptService {
     }
 
     return filePath;
+  }
+
+  async audioToText(audioFile: Express.Multer.File, prompt?: string) {
+    return await audioToTextUseCase(this.openai, { audioFile, prompt });
   }
 
 }
